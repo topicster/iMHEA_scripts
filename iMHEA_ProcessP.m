@@ -24,7 +24,7 @@ function [IndicesP,PM,IDC,CumP,DP] = iMHEA_ProcessP(Date,P,varargin)
 % Boris Ochoa Tocachi
 % Imperial College London
 % Created in May, 2014
-% Last edited in November, 2017
+% Last edited in February, 2018
 
 %% PROCESS
 

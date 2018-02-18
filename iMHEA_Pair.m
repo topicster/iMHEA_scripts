@@ -21,12 +21,12 @@ function [Indices,Climate,PM,QM,FDC1,FDC2,IDC1,IDC2] = iMHEA_Pair(Date1,P1,Q1,A1
 % Boris Ochoa Tocachi
 % Imperial College London
 % Created in June, 2014
-% Last edited in November, 2017
+% Last edited in February, 2018
 
 %% PROCESS
 % Initialise variables
 Climate = zeros(13,2);
-Indices = zeros(57,2);
+Indices = zeros(59,2);
 PM = zeros(12,2);
 QM = zeros(12,2);
 % Calculate indices for Discharge and Precipitation.

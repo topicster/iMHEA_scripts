@@ -1,16 +1,18 @@
 function [BQ2,SQ2,BFI2,k] = iMHEA_BaseFlow(Date,Q,varargin)
-%iMHEA Baseflow separation.
-% [BQ,SQ] = iMHEA_BaseFlow(Date,Q,flag).
+%iMHEA Baseflow separation following Chapman (1999).
+% [BQ,SQ,BFI,k] = iMHEA_BaseFlow(Date,Q,flag).
 %
 % Input:
 % Date = dd/mm/yyyy hh:mm:ss [date format].
+% Q    = Daily Discharge [l/s].
 %        A regular interval in the Q time series is needed.
-% Q = Daily Discharge [l/s].
 % flag = leave empty NOT to graph plots.
 %
 % Output:
-% BQ = Baseflow [l/s].
-% SQ = Stormflow [l/s].
+% BQ  = Baseflow [l/s].
+% SQ  = Stormflow [l/s].
+% BFI = Baseflow Index [-].
+% k   = Recession constant [-].
 %
 % Boris Ochoa Tocachi
 % Imperial College London

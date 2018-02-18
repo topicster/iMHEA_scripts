@@ -3,7 +3,7 @@ function [DataHRes,Data1day,Data1hr,Indices,Climate] = iMHEA_Workflow(AREA,DateQ
 % [DataHRes,Data1day,Data1hr,Indices,Climate] =
 % iMHEA_Workflow(AREA,DateQ,Q,bucket,DateP1,P1,DateP2,P2,DateP3,P3,...)
 % processes the raw precipitation and discharge data to get processed data.
-%
+%Rainfal
 % Input:
 % AREA   = Catchment area [km2].
 % DateQ  = dd/mm/yyyy hh:mm:ss [date format] for discharge.
@@ -14,17 +14,18 @@ function [DataHRes,Data1day,Data1hr,Indices,Climate] = iMHEA_Workflow(AREA,DateQ
 %
 % Output:
 % DataHres = [Date, P, Q] at max resolution, e.g. 5min.
-% Data1day = [Date, P, Q] at 1 day resolution.
+% Data1day = [Date, P, Q, BQ] at 1 day resolution.
 % Data1hr  = [Date, P, Q] at 1 hour resolution.
 %             P = Average Precipitation [mm].
 %             Q = Normalised Discharge [l/s/km2].
+%             BQ = Normalised Baseflow [l/s/km2].
 % Indices  = Vector of hydrological indices from streamflow.
 % Climate  = Vector of climate indices from precipitation.
 %
 % Boris Ochoa Tocachi
 % Imperial College London
 % Created in November, 2017
-% Last edited in November, 2017
+% Last edited in Feberuary, 2018
 
 %% START PROCESS
 fprintf('\n')
@@ -123,8 +124,10 @@ DataHRes(:,1) = DataHRes(:,1)/nd;
 Data1day(:,3:end) = [];
 Data1hr(:,3:end) = [];
 % Average stream flows
-[~,Data1day(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3),1440);
-[~,Data1hr(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3),60);
+[~,Data1day(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3)/AREA,1440);
+[~,Data1hr(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3)/AREA,60);
+% Calculate daily baseflow
+[~,Data1day(:,4)] = iMHEA_BaseFlowUK(DataHRes(:,1),DataHRes(:,3)/AREA);
 
 %% PLOT RESULTING TIME SERIES
 iMHEA_Plot3(datetime(DataHRes(:,1),'ConvertFrom','datenum'),DataHRes(:,2),DataHRes(:,3))

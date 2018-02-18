@@ -25,27 +25,29 @@ function [IndicesQ,QM,FDC,CumQ,DQ] = iMHEA_ProcessQ(Date,Q,A,varargin)
 %               QDML  = Long-term Mean Daily flow [l/s].
 %               Q50   = 50th percentile [l/s].
 %           Regulation:
-%               BFI   = Baseflow Index [-].
-%               k     = Recession constant [-].
+%               BFI1   = Baseflow index from UK handbook [-].
+%               k1     = Recession constant from UK handbook [-].
+%               BFI2   = Baseflow index 2-parameter algorithm [-].
+%               k2     = Recession constant 2-parameter algorithm [-].
 %               Range = Discharge range [-] Qmax/Qmin.
 %               R2FDC = Slope of the FDC between 33%-66% / Mean flow [-].
 %               IRH   = Hydrological Regulation Index [-].
 %               RBI1  = Richards-Baker annual flashiness index [-].
 %               RBI2  = Richards-Baker seasonal flashiness index [-].
 %               DRYQMEAN = Min monthly flow / Mean monthly flow [-].
-%               DRYQMEAN = Min monthly flow / Max monthly flow [-].
+%               DRYQWET  = Min monthly flow / Max monthly flow [-].
 %               SINDQ = Seasonality Index in flows [-].
-% QDMM = Monthly Mean Daily flow (l/s) per month number [Jan=1, Dec=12].
+% QM = Monthly Mean Daily flow (l/s) per month number [Jan=1, Dec=12].
 % FDC  = Flow Duration Curve [l/s v %].
 % CumQ = Date and Cumulative Discharge [l/s].
 % DQ   = Daily Discharge only when data exist [date v l/s], including:
 %        BQ: Baseflow [l/s].
 %        SQ: Stormflow [l/s].
 %
-% Dissertation project
 % Boris Ochoa Tocachi
-% Imperial College London - CID 00897678
-% May, 2014
+% Imperial College London
+% Created in May, 2014
+% Last edited in February, 2018
 
 %% PROCESS
 
@@ -63,7 +65,6 @@ CumQ = [datenum(DDate),DCumQ];
 NewDate = DDate(~isnan(DQ));
 NewQ = DQ(~isnan(DQ));
 l = length(NewQ);
-DQ = [datenum(NewDate),NewQ];
 
 % Number of Days with zero flow.
 ZeroQ = NewQ(NewQ==0);
@@ -105,13 +106,17 @@ Q95 = Ptile(1);
 Q50 = Ptile(4);
 Q10 = Ptile(7);
 
-% Baseflow index.
+% Baseflow index at daily scale.
 if nargin >= 5
-    [BQ,SQ,BFI,k] = iMHEA_BaseFlow(NewDate,NewQ,1); % Daily
+    [~,BQ1,SQ1,BFI1,k1] = iMHEA_BaseFlowUK(Date,Q,1,1); % Gustard et al., 1992
+    [~,~,BFI2,k2] = iMHEA_BaseFlow(NewDate,NewQ,1); % Chapman, 1999
 else
-    [BQ,SQ,BFI,k] = iMHEA_BaseFlow(NewDate,NewQ); % Daily
+    [~,BQ1,SQ1,BFI1,k1] = iMHEA_BaseFlowUK(Date,Q,1); % Gustard et al., 1992
+    [~,~,BFI2,k2] = iMHEA_BaseFlow(NewDate,NewQ); % Chapman, 1999
 end
-DQ = [DQ,BQ,SQ];
+
+% Compile daily flows.
+DQ = [datenum(DDate),DQ,BQ1,SQ1];
 
 % Richards-Baker flashiness index (RBI).
 Qi_1 = abs(diff(NewQ));
@@ -130,8 +135,10 @@ IndicesQ = [QDMin;...
            QDMY;...
            QDML;...
            Q50;...
-           BFI;...
-           k;...
+           BFI1;...
+           k1;...
+           BFI2;...
+           k2;...
            RANGE;...
            R2FDC;...
            IRH;...
