@@ -12,10 +12,11 @@ function [DataHRes,Data1day,Data1hr,Indices,Climate,PM,QM,FDC1,FDC2,IDC1,IDC2] =
 %
 % Output:
 % DataHres = [Date, P1, Q1, P2, Q2] at max resolution, e.g. 5min.
-% Data1day = [Date, P1, Q1, P2, Q2] at 1 day resolution.
+% Data1day = [Date, P1, Q1, BQ1 P2, Q2, BQ2] at 1 day resolution.
 % Data1hr  = [Date, P1, Q1, P2, Q2] at 1 hour resolution.
-%             P1, Q1 = Catchment 1.
-%             P1, Q1 = Catchment 2.
+%             P1, Q1, BQ1 = Catchment 1.
+%             P1, Q1, BQ2 = Catchment 2.
+%             BQ = Normalised Baseflow [l/s/km2].
 % Indices  = Matrix of hydrological indices from streamflow.
 % Climate  = Matrix of climate indices from precipitation.
 % PM = Monthly precipitation (mm) per month number [Jan=1, Dec=12].
@@ -27,7 +28,7 @@ function [DataHRes,Data1day,Data1hr,Indices,Climate,PM,QM,FDC1,FDC2,IDC1,IDC2] =
 % Boris Ochoa Tocachi
 % Imperial College London
 % Created in November, 2017
-% Last edited in November, 2017
+% Last edited in February, 2018
 
 %% START PROCESS
 fprintf('\n')
@@ -83,16 +84,20 @@ DataHRes(:,1) = DataHRes(:,1)/nd;
 % Aggregate precipitation
 [Data1day] = iMHEA_Aggregation(DataHRes(:,1),DataHRes(:,2),1440);
 Data1day(:,3:end) = nan;
-[~,Data1day(:,4)] = iMHEA_Aggregation(DataHRes(:,1),DataHRes(:,4),1440);
+[~,Data1day(:,5)] = iMHEA_Aggregation(DataHRes(:,1),DataHRes(:,4),1440);
 [Data1hr] = iMHEA_Aggregation(DataHRes(:,1),DataHRes(:,2),60);
 Data1hr(:,3:end) = nan;
 [~,Data1hr(:,4)] = iMHEA_Aggregation(DataHRes(:,1),DataHRes(:,4),60);
 
 % Average stream flows
 [~,Data1day(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3),1440);
-[~,Data1day(:,5)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,5),1440);
+[~,Data1day(:,6)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,5),1440);
 [~,Data1hr(:,3)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,3),60);
 [~,Data1hr(:,5)] = iMHEA_Average(DataHRes(:,1),DataHRes(:,5),60);
+
+% Calculate daily baseflow
+[~,Data1day(:,4)] = iMHEA_BaseFlowUK(DataHRes(:,1),DataHRes(:,3));
+[~,Data1day(:,7)] = iMHEA_BaseFlowUK(DataHRes(:,1),DataHRes(:,5));
 
 %% CALCULATE HYDROLOGICAL AND CLIMATE INDICES
 Date1 = datetime(DataHRes(:,1),'ConvertFrom','datenum');

@@ -25,7 +25,8 @@ function [IndicesP,PM,IDC,IndicesQ,QM,FDC,QYEAR,RRa,RRm,RRl,CumP,CumQ,DP,DQ] = i
 %           Low flows:
 %               QDMin = Minimum daily flow [l/s/km2].
 %               Q95   = 95 Percentile flow from IDC [l/s/km2].
-%               DayQ0 = Number of Days with zero flow per year [-].
+%               DayQ0 = Days with zero flow per year [-].
+%               PQ0   = Proportion of days with zero flow per year [-].
 %               QMDry = Mean daily flow of driest month [l/s/km2].
 %           High flows:
 %               QDMax = Maximum Daily flow [l/s/km2].
@@ -35,10 +36,18 @@ function [IndicesP,PM,IDC,IndicesQ,QM,FDC,QYEAR,RRa,RRm,RRl,CumP,CumQ,DP,DQ] = i
 %               QDML  = Long-term Mean Daily flow [l/s/km2].
 %               Q50   = 50 percentile flow from IDC [l/s/km2].
 %           Regulation:
-%               BFI   = Baseflow index [-].
-%               k     = Recession constant [-].
-%               Range = Discharge range [-] Qmax/Qmin.
-%               R2FDC = Slope of the FDC between 33% and 66% / Mean flow.
+%               BFI1   = Baseflow index from UK handbook [-].
+%               k1     = Recession constant from UK handbook [-].
+%               BFI2   = Baseflow index 2-parameter algorithm [-].
+%               k2     = Recession constant 2-parameter algorithm [-].
+%               Range  = Discharge range [-] Qmax/Qmin.
+%               R2FDC  = Slope of the FDC between 33% and 66% / Mean flow.
+%               IRH   = Hydrological Regulation Index [-].
+%               RBI1  = Richards-Baker annual flashiness index [-].
+%               RBI2  = Richards-Baker seasonal flashiness index [-].
+%               DRYQMEAN = Min monthly flow / Mean monthly flow [-].
+%               DRYQWET  = Min monthly flow / Max monthly flow [-].
+%               SINDQ = Seasonality Index in flows [-].
 % QM = Monthly Mean Daily flow (l/s) per month number [Jan=1, Dec=12].
 % FDC  = Flow Duration Curve [l/s v %].
 %
@@ -56,7 +65,7 @@ function [IndicesP,PM,IDC,IndicesQ,QM,FDC,QYEAR,RRa,RRm,RRl,CumP,CumQ,DP,DQ] = i
 % Boris Ochoa Tocachi
 % Imperial College London
 % Created in June, 2014
-% Last edited in November, 2017
+% Last edited in February, 2018
 
 %% PROCESS
 
